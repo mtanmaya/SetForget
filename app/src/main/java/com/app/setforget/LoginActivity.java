@@ -31,6 +31,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -38,11 +44,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-/**
+/**UserLoginTask
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
@@ -75,6 +82,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private GoogleSignInClient mGoogleSignInClient;
 
+    private static final String EMAIL = "email";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,6 +132,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+        //[START] FaceBook login API
+        CallbackManager callbackManager = CallbackManager.Factory.create();
+
+        LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+        loginButton.setReadPermissions(Arrays.asList(EMAIL));
+        // If you are using in a fragment, call loginButton.setFragment(this);
+
+        // Callback registration
+        loginButton.registerCallback(callbackManager, new LoginFacebookCallback());
+        //[END] FaceBook login API
+
     }
 
     @Override
@@ -136,6 +156,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Log.e(TAG, "account " + account.getEmail());
         } else {
             Log.e(TAG, "account is " + account);
+        }
+
+        // check if the user is already logged in through FB API
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        if(isLoggedIn) {
+            Log.e(TAG, "if isLoggedIn " + isLoggedIn);
+        } else {
+            Log.e(TAG, "isLoggedIn is " + isLoggedIn);
         }
 
         //updateUI(account);
@@ -398,6 +427,37 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Log.e(TAG, "sign in button clicked!!!");
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private class LoginFacebookCallback implements FacebookCallback<LoginResult> {
+
+        /**
+         * Called when the dialog completes without error.
+         *
+         * @param loginResult Result from the dialog
+         */
+        @Override
+        public void onSuccess(LoginResult loginResult) {
+
+        }
+
+        /**
+         * Called when the dialog is canceled.
+         */
+        @Override
+        public void onCancel() {
+
+        }
+
+        /**
+         * Called when the dialog finishes with an error.
+         *
+         * @param error The error that occurred
+         */
+        @Override
+        public void onError(FacebookException error) {
+
+        }
     }
 }
 
