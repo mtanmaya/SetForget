@@ -1,4 +1,4 @@
 # SetForget
 Initial Commit
-Integrated SignIn/SignUp with Google API
-Integrated SignIn/SignUp with Facebook API
+1. Integrated SignIn/SignUp with Google API
+2. Integrated SignIn/SignUp with Facebook API
